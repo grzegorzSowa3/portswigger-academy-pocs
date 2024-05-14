@@ -20,8 +20,7 @@ def GET_login() -> http.client.HTTPResponse:
         'sec-fetch-user': '?1',
         'te': 'trailers',
     }
-    connection = http.client.HTTPSConnection('localhost', 27001, context=ssl._create_unverified_context())
-    connection.set_tunnel(host, port)
+    connection = http.client.HTTPSConnection(host, port, context=ssl._create_unverified_context())
     connection.request(method, path, ''.encode('utf-8'), headers)
     return connection.getresponse()
 
@@ -54,8 +53,7 @@ def POST_login(
     }
     body = urllib.parse.urlencode(fields)
     headers['Content-Length'] = str(len(body))
-    connection = http.client.HTTPSConnection('localhost', 27001, context=ssl._create_unverified_context())
-    connection.set_tunnel(host, port)
+    connection = http.client.HTTPSConnection(host, port, context=ssl._create_unverified_context())
     connection.request(method, path, body, headers)
     return connection.getresponse()
 
@@ -77,8 +75,7 @@ def GET_myaccount(
         'sec-fetch-user': '?1',
         'te': 'trailers',
     }
-    connection = http.client.HTTPSConnection('localhost', 27001, context=ssl._create_unverified_context())
-    connection.set_tunnel(host, port)
+    connection = http.client.HTTPSConnection(host, port, context=ssl._create_unverified_context())
     connection.request(method, path, ''.encode('utf-8'), headers)
     return connection.getresponse()
 
