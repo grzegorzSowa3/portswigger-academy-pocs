@@ -7,7 +7,7 @@ import subprocess
 from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.test import encode_multipart
 
-LAB_ID = "0af400a70468220a8064a33800410067"
+LAB_ID = "???"
 
 
 def GET_login() -> http.client.HTTPResponse:

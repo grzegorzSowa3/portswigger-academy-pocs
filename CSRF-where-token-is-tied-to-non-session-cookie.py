@@ -3,7 +3,7 @@ import re
 import ssl
 import urllib
 
-LAB_ID = "????"
+LAB_ID = "???"
 
 
 def GET_login() -> http.client.HTTPResponse:
