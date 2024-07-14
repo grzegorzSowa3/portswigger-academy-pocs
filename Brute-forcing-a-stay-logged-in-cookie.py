@@ -3,7 +3,7 @@ import hashlib
 import http.client
 import ssl
 
-LAB_ID = "0a6100b4045307108080f920007a0033"
+LAB_ID = "???"
 
 
 def GET_myaccount(

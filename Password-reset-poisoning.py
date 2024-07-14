@@ -3,8 +3,8 @@ import ssl
 import urllib.parse
 import http.client
 
-LAB_ID = "0af4003e0467caf98138b1ee003a00c5"
-EXPLOIT_SERVER_ID = "0ac3005704a8ca4f81f2b0a0010300e1"
+LAB_ID = "???"
+EXPLOIT_SERVER_ID = "???"
 
 
 def GET_forgotpassword() -> http.client.HTTPResponse:
